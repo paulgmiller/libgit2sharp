@@ -491,7 +491,7 @@ namespace LibGit2Sharp.Tests
             {
                 Branch master = repo.Branches["master"];
                 const string logMessage = "update target message";
-                repo.Refs.UpdateTarget("refs/remotes/origin/master", "origin/test", logMessage);
+                repo.Refs.UpdateTarget("refs/remotes/origin/master", "origin/test", logMessage, Constants.Signature);
 
                 Assert.True(master.IsTracking);
                 Assert.NotNull(master.TrackedBranch);

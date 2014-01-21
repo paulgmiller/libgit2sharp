@@ -35,13 +35,13 @@ namespace LibGit2Sharp
         /// <summary>
         /// Creates a direct or symbolic reference with the specified name and target
         /// </summary>
+        /// <param name="refsColl">The <see cref="ReferenceCollection"/> being worked with.</param>
         /// <param name="name">The name of the reference to create.</param>
         /// <param name="canonicalRefNameOrObjectish">The target which can be either the canonical name of a reference or a revparse spec.</param>
-        /// <param name="allowOverwrite">True to allow silent overwriting a potentially existing reference, false otherwise.</param>
-        /// <param name="refsColl">The <see cref="ReferenceCollection"/> being worked with.</param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> when adding the <see cref="Reference"/></param>
+        /// <param name="allowOverwrite">True to allow silent overwriting a potentially existing reference, false otherwise.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public static Reference Add(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish, bool allowOverwrite = false, string logMessage = null)
+        public static Reference Add(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish, string logMessage, Signature signature, bool allowOverwrite = false)
         {
             Ensure.ArgumentNotNullOrEmptyString(name, "name");
             Ensure.ArgumentNotNullOrEmptyString(canonicalRefNameOrObjectish, "canonicalRefNameOrObjectish");
@@ -53,7 +53,7 @@ namespace LibGit2Sharp
 
             if (refState == RefState.Exists)
             {
-                return refsColl.Add(name, reference, allowOverwrite, logMessage);
+                return refsColl.Add(name, reference, logMessage, signature, allowOverwrite);
             }
 
             if (refState == RefState.DoesNotExistButLooksValid && gitObject == null)
@@ -66,8 +66,14 @@ namespace LibGit2Sharp
 
             Ensure.GitObjectIsNotNull(gitObject, canonicalRefNameOrObjectish);
 
-            return refsColl.Add(name, gitObject.Id, allowOverwrite, logMessage);
+            return refsColl.Add(name, gitObject.Id, logMessage, signature, allowOverwrite);
         }
+
+        public static Reference Add(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish, bool allowOverwrite = false)
+        {
+            return Add(refsColl, name, canonicalRefNameOrObjectish, null, null, allowOverwrite);
+        }
+
         /// <summary>
         /// Updates the target of a direct reference.
         /// </summary>
@@ -76,7 +82,7 @@ namespace LibGit2Sharp
         /// <param name="refsColl">The <see cref="ReferenceCollection"/> being worked with.</param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> of the <paramref name="directRef"/> reference.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public static Reference UpdateTarget(this ReferenceCollection refsColl, Reference directRef, string objectish, string logMessage = null)
+        public static Reference UpdateTarget(this ReferenceCollection refsColl, Reference directRef, string objectish, string logMessage, Signature signature)
         {
             Ensure.ArgumentNotNull(directRef, "directRef");
             Ensure.ArgumentNotNull(objectish, "objectish");
@@ -85,7 +91,12 @@ namespace LibGit2Sharp
 
             Ensure.GitObjectIsNotNull(target, objectish);
 
-            return refsColl.UpdateTarget(directRef, target.Id, logMessage);
+            return refsColl.UpdateTarget(directRef, target.Id, logMessage, signature);
+        }
+
+        public static Reference UpdateTarget(this ReferenceCollection refsColl, Reference directRef, string objectish)
+        {
+            return UpdateTarget(refsColl, directRef, objectish, null, null);
         }
 
         /// <summary>
@@ -120,7 +131,7 @@ namespace LibGit2Sharp
         /// <param name="refsColl">The <see cref="ReferenceCollection"/> being worked with.</param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> of the <paramref name="name"/> reference.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public static Reference UpdateTarget(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish, string logMessage = null)
+        public static Reference UpdateTarget(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish, string logMessage, Signature signature)
         {
             Ensure.ArgumentNotNullOrEmptyString(name, "name");
             Ensure.ArgumentNotNullOrEmptyString(canonicalRefNameOrObjectish, "canonicalRefNameOrObjectish");
@@ -135,7 +146,7 @@ namespace LibGit2Sharp
             var directReference = reference as DirectReference;
             if (directReference != null)
             {
-                return refsColl.UpdateTarget(directReference, canonicalRefNameOrObjectish, logMessage);
+                return refsColl.UpdateTarget(directReference, canonicalRefNameOrObjectish, logMessage, signature);
             }
 
             var symbolicReference = reference as SymbolicReference;
@@ -150,11 +161,17 @@ namespace LibGit2Sharp
                     throw new ArgumentException(String.Format(CultureInfo.InvariantCulture, "The reference specified by {0} is a Symbolic reference, you must provide a reference canonical name as the target.", name), "canonicalRefNameOrObjectish");
                 }
 
-                return refsColl.UpdateTarget(symbolicReference, targetRef, logMessage);
+                return refsColl.UpdateTarget(symbolicReference, targetRef, logMessage, signature);
             }
 
             throw new LibGit2SharpException(string.Format(CultureInfo.InvariantCulture, "Reference '{0}' has an unexpected type ('{1}').", name, reference.GetType()));
         }
+
+        public static Reference UpdateTarget(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish)
+        {
+            return UpdateTarget(refsColl, name, canonicalRefNameOrObjectish, null, null);
+        }
+
 
         /// <summary>
         /// Delete a reference with the specified name

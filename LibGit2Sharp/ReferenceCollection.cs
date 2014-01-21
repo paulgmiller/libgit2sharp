@@ -71,10 +71,11 @@ namespace LibGit2Sharp
         /// </summary>
         /// <param name="name">The canonical name of the reference to create.</param>
         /// <param name="targetId">Id of the target object.</param>
-        /// <param name="allowOverwrite">True to allow silent overwriting a potentially existing reference, false otherwise.</param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> when adding the <see cref="DirectReference"/></param>
+        /// <param name="signature"></param>
+        /// <param name="allowOverwrite">True to allow silent overwriting a potentially existing reference, false otherwise.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public virtual DirectReference Add(string name, ObjectId targetId, bool allowOverwrite = false, string logMessage = null, Signature signature = null)
+        public virtual DirectReference Add(string name, ObjectId targetId, string logMessage, Signature signature, bool allowOverwrite = false)
         {
             Ensure.ArgumentNotNullOrEmptyString(name, "name");
             Ensure.ArgumentNotNull(targetId, "targetId");
@@ -89,15 +90,21 @@ namespace LibGit2Sharp
             }
         }
 
+        public virtual DirectReference Add(string name, ObjectId targetId, bool allowOverwrite = false)
+        {
+            return Add(name, targetId, null, null, allowOverwrite);
+        }
+
         /// <summary>
         /// Creates a symbolic reference  with the specified name and target
         /// </summary>
         /// <param name="name">The canonical name of the reference to create.</param>
         /// <param name="targetRef">The target reference.</param>
-        /// <param name="allowOverwrite">True to allow silent overwriting a potentially existing reference, false otherwise.</param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> when adding the <see cref="SymbolicReference"/></param>
+        /// <param name="signature"></param>
+        /// <param name="allowOverwrite">True to allow silent overwriting a potentially existing reference, false otherwise.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public virtual SymbolicReference Add(string name, Reference targetRef, bool allowOverwrite = false, string logMessage = null, Signature signature = null)
+        public virtual SymbolicReference Add(string name, Reference targetRef, string logMessage, Signature signature, bool allowOverwrite = false)
         {
             Ensure.ArgumentNotNullOrEmptyString(name, "name");
             Ensure.ArgumentNotNull(targetRef, "targetRef");
@@ -110,6 +117,11 @@ namespace LibGit2Sharp
 
                 return newTarget;
             }
+        }
+
+        public virtual SymbolicReference Add(string name, Reference targetRef, bool allowOverwrite = false)
+        {
+            return Add(name, targetRef, null, null, allowOverwrite);
         }
 
         /// <summary>
@@ -164,7 +176,7 @@ namespace LibGit2Sharp
         /// <param name="targetId">The new target.</param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> of the <paramref name="directRef"/> reference</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public virtual Reference UpdateTarget(Reference directRef, ObjectId targetId, string logMessage = null, Signature signature = null)
+        public virtual Reference UpdateTarget(Reference directRef, ObjectId targetId, string logMessage, Signature signature)
         {
             Ensure.ArgumentNotNull(directRef, "directRef");
             Ensure.ArgumentNotNull(targetId, "targetId");
@@ -177,6 +189,11 @@ namespace LibGit2Sharp
             return newTarget;
         }
 
+        public virtual Reference UpdateTarget(Reference directRef, ObjectId targetId)
+        {
+            return UpdateTarget(directRef, targetId, null, null);
+        }
+
         /// <summary>
         /// Updates the target of a symbolic reference.
         /// </summary>
@@ -184,7 +201,7 @@ namespace LibGit2Sharp
         /// <param name="targetRef">The new target.</param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> of the <paramref name="symbolicRef"/> reference.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public virtual Reference UpdateTarget(Reference symbolicRef, Reference targetRef, string logMessage = null, Signature signature = null)
+        public virtual Reference UpdateTarget(Reference symbolicRef, Reference targetRef, string logMessage, Signature signature)
         {
             Ensure.ArgumentNotNull(symbolicRef, "symbolicRef");
             Ensure.ArgumentNotNull(targetRef, "targetRef");
@@ -195,6 +212,11 @@ namespace LibGit2Sharp
             LogReference(symbolicRef, targetRef, logMessage, signature);
 
             return newTarget;
+        }
+
+        public virtual Reference UpdateTarget(Reference symbolicRef, Reference targetRef)
+        {
+            return UpdateTarget(symbolicRef, targetRef, null, null);
         }
 
         private Reference UpdateTarget<T>(Reference reference, T target, Func<ReferenceSafeHandle, T, ReferenceSafeHandle> setter)
