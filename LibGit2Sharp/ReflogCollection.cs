@@ -98,9 +98,9 @@ namespace LibGit2Sharp
         /// The native reflog object will be saved right after inserting the entry.
         /// </summary>
         /// <param name="target">the <see cref="ObjectId"/> of the new target the <see cref="Reference"/> will point out to.</param>
-        /// <param name="reflogMessage">the message associated with the new <see cref="ReflogEntry"/>.</param>
         /// <param name="committer"><see cref="Signature"/> of the comitter.</param>
-        internal virtual void Append(ObjectId target, string reflogMessage, Signature committer)
+        /// <param name="reflogMessage">the message associated with the new <see cref="ReflogEntry"/>.</param>
+        internal virtual void Append(ObjectId target, Signature committer, string reflogMessage)
         {
             var logAllRefUpdates = repo.Config.GetValueOrDefault<bool>("core.logAllRefUpdates", false);
             if (!logAllRefUpdates)
@@ -127,7 +127,7 @@ namespace LibGit2Sharp
         internal void Append(ObjectId target, string reflogMessage)
         {
             Signature author = repo.Config.BuildSignature(DateTimeOffset.Now, false);
-            Append(target, reflogMessage, author);
+            Append(target, author, reflogMessage);
         }
     }
 }

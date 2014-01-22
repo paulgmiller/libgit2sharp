@@ -71,11 +71,11 @@ namespace LibGit2Sharp
         /// </summary>
         /// <param name="name">The canonical name of the reference to create.</param>
         /// <param name="targetId">Id of the target object.</param>
-        /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> when adding the <see cref="DirectReference"/></param>
         /// <param name="signature"></param>
+        /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> when adding the <see cref="DirectReference"/></param>
         /// <param name="allowOverwrite">True to allow silent overwriting a potentially existing reference, false otherwise.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public virtual DirectReference Add(string name, ObjectId targetId, string logMessage, Signature signature, bool allowOverwrite = false)
+        public virtual DirectReference Add(string name, ObjectId targetId, Signature signature, string logMessage, bool allowOverwrite = false)
         {
             Ensure.ArgumentNotNullOrEmptyString(name, "name");
             Ensure.ArgumentNotNull(targetId, "targetId");
@@ -84,7 +84,7 @@ namespace LibGit2Sharp
             {
                 var newTarget = (DirectReference)Reference.BuildFromPtr<Reference>(handle, repo);
 
-                LogReference(newTarget, targetId, logMessage, signature);
+                LogReference(newTarget, targetId, signature, logMessage);
 
                 return newTarget;
             }
@@ -100,11 +100,11 @@ namespace LibGit2Sharp
         /// </summary>
         /// <param name="name">The canonical name of the reference to create.</param>
         /// <param name="targetRef">The target reference.</param>
-        /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> when adding the <see cref="SymbolicReference"/></param>
         /// <param name="signature"></param>
+        /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> when adding the <see cref="SymbolicReference"/></param>
         /// <param name="allowOverwrite">True to allow silent overwriting a potentially existing reference, false otherwise.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public virtual SymbolicReference Add(string name, Reference targetRef, string logMessage, Signature signature, bool allowOverwrite = false)
+        public virtual SymbolicReference Add(string name, Reference targetRef, Signature signature, string logMessage, bool allowOverwrite = false)
         {
             Ensure.ArgumentNotNullOrEmptyString(name, "name");
             Ensure.ArgumentNotNull(targetRef, "targetRef");
@@ -113,7 +113,7 @@ namespace LibGit2Sharp
             {
                 var newTarget = (SymbolicReference)Reference.BuildFromPtr<Reference>(handle, repo);
 
-                LogReference(newTarget, targetRef, logMessage, signature);
+                LogReference(newTarget, targetRef, signature, logMessage);
 
                 return newTarget;
             }
@@ -174,9 +174,10 @@ namespace LibGit2Sharp
         /// </summary>
         /// <param name="directRef">The direct reference which target should be updated.</param>
         /// <param name="targetId">The new target.</param>
+        /// <param name="signature"></param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> of the <paramref name="directRef"/> reference</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public virtual Reference UpdateTarget(Reference directRef, ObjectId targetId, string logMessage, Signature signature)
+        public virtual Reference UpdateTarget(Reference directRef, ObjectId targetId, Signature signature, string logMessage)
         {
             Ensure.ArgumentNotNull(directRef, "directRef");
             Ensure.ArgumentNotNull(targetId, "targetId");
@@ -184,7 +185,7 @@ namespace LibGit2Sharp
             Reference newTarget = UpdateTarget(directRef, targetId,
                 Proxy.git_reference_set_target);
 
-            LogReference(directRef, targetId, logMessage, signature);
+            LogReference(directRef, targetId, signature, logMessage);
 
             return newTarget;
         }
@@ -199,9 +200,10 @@ namespace LibGit2Sharp
         /// </summary>
         /// <param name="symbolicRef">The symbolic reference which target should be updated.</param>
         /// <param name="targetRef">The new target.</param>
+        /// <param name="signature"></param>
         /// <param name="logMessage">The optional message to log in the <see cref="ReflogCollection"/> of the <paramref name="symbolicRef"/> reference.</param>
         /// <returns>A new <see cref="Reference"/>.</returns>
-        public virtual Reference UpdateTarget(Reference symbolicRef, Reference targetRef, string logMessage, Signature signature)
+        public virtual Reference UpdateTarget(Reference symbolicRef, Reference targetRef, Signature signature, string logMessage)
         {
             Ensure.ArgumentNotNull(symbolicRef, "symbolicRef");
             Ensure.ArgumentNotNull(targetRef, "targetRef");
@@ -209,7 +211,7 @@ namespace LibGit2Sharp
             Reference newTarget = UpdateTarget(symbolicRef, targetRef,
                 (h, r) => Proxy.git_reference_symbolic_set_target(h, r.CanonicalName));
 
-            LogReference(symbolicRef, targetRef, logMessage, signature);
+            LogReference(symbolicRef, targetRef, signature, logMessage);
 
             return newTarget;
         }
@@ -251,7 +253,7 @@ namespace LibGit2Sharp
             }
         }
 
-        private void LogReference(Reference reference, Reference target, string logMessage, Signature signature)
+        private void LogReference(Reference reference, Reference target, Signature signature, string logMessage)
         {
             var directReference = target.ResolveToDirectReference();
 
@@ -260,17 +262,17 @@ namespace LibGit2Sharp
                 return;
             }
 
-            LogReference(reference, directReference.Target.Id, logMessage, signature);
+            LogReference(reference, directReference.Target.Id, signature, logMessage);
         }
 
-        private void LogReference(Reference reference, ObjectId target, string logMessage, Signature signature)
+        private void LogReference(Reference reference, ObjectId target, Signature signature, string logMessage)
         {
             if (string.IsNullOrEmpty(logMessage) || signature == null)
             {
                 return;
             }
 
-            repo.Refs.Log(reference).Append(target, logMessage, signature);
+            repo.Refs.Log(reference).Append(target, signature, logMessage);
         }
 
         internal ReferenceSafeHandle RetrieveReferencePtr(string referenceName, bool shouldThrowIfNotFound = true)

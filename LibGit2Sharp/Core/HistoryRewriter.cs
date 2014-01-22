@@ -107,7 +107,7 @@ namespace LibGit2Sharp.Core
             {
                 return RewriteReference(
                     sref, old => old.Target, RewriteReference,
-                    (refs, old, target, logMessage, sig) => refs.UpdateTarget(old, target, logMessage, sig));
+                    (refs, old, target, sig, logMessage) => refs.UpdateTarget(old, target, sig, logMessage));
             }
 
             var dref = reference as DirectReference;
@@ -115,14 +115,14 @@ namespace LibGit2Sharp.Core
             {
                 return RewriteReference(
                     dref, old => old.Target, RewriteTarget,
-                    (refs, old, target, logMessage, sig) => refs.UpdateTarget(old, target.Id, logMessage, sig));
+                    (refs, old, target, sig, logMessage) => refs.UpdateTarget(old, target.Id, sig, logMessage));
             }
 
             return reference;
         }
 
         private delegate Reference ReferenceUpdater<in TRef, in TTarget>(
-            ReferenceCollection refs, TRef origRef, TTarget origTarget, string logMessage, Signature signature)
+            ReferenceCollection refs, TRef origRef, TTarget origTarget, Signature signature, string logMessage)
             where TRef : Reference
             where TTarget : class;
 
@@ -160,18 +160,18 @@ namespace LibGit2Sharp.Core
                     String.Format("Can't back up reference '{0}' - '{1}' already exists", oldRef.CanonicalName, backupName));
             }
 
-            repo.Refs.Add(backupName, oldRef.TargetIdentifier, "filter-branch: backup", signature);
+            repo.Refs.Add(backupName, oldRef.TargetIdentifier, signature, "filter-branch: backup");
             rollbackActions.Enqueue(() => repo.Refs.Remove(backupName));
 
             if (newTarget == null)
             {
                 repo.Refs.Remove(oldRef);
-                rollbackActions.Enqueue(() => repo.Refs.Add(oldRef.CanonicalName, oldRef, "filter-branch: abort", signature, true));
+                rollbackActions.Enqueue(() => repo.Refs.Add(oldRef.CanonicalName, oldRef, signature, "filter-branch: abort", true));
                 return refMap[oldRef] = null;
             }
 
-            Reference newRef = updateTarget(repo.Refs, oldRef, newTarget, "filter-branch: rewrite", signature);
-            rollbackActions.Enqueue(() => updateTarget(repo.Refs, oldRef, oldRefTarget, "filter-branch: abort", signature));
+            Reference newRef = updateTarget(repo.Refs, oldRef, newTarget, signature, "filter-branch: rewrite");
+            rollbackActions.Enqueue(() => updateTarget(repo.Refs, oldRef, oldRefTarget, signature, "filter-branch: abort"));
 
             if (newRef.CanonicalName == newRefName)
             {

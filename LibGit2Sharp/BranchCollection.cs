@@ -218,7 +218,7 @@ namespace LibGit2Sharp
                 return;
             }
 
-            repo.Refs.Log(branch.CanonicalName).Append(branch.Tip.Id, logMessage, branch.Tip.Committer);
+            repo.Refs.Log(branch.CanonicalName).Append(branch.Tip.Id, branch.Tip.Committer, logMessage);
         }
     }
 }

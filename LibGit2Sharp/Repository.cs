@@ -914,11 +914,11 @@ namespace LibGit2Sharp
             // in case HEAD targets a symbolic reference, log commit on the targeted direct reference
             if (headRef is SymbolicReference)
             {
-                Refs.Log(headRef.ResolveToDirectReference()).Append(commit.Id, reflogMessage, commit.Committer);
+                Refs.Log(headRef.ResolveToDirectReference()).Append(commit.Id, commit.Committer, reflogMessage);
             }
 
             // Log commit on HEAD
-            Refs.Log(headRef).Append(commit.Id, reflogMessage, commit.Committer);
+            Refs.Log(headRef).Append(commit.Id, commit.Committer, reflogMessage);
         }
 
         private IEnumerable<Commit> RetrieveParentsOfTheCommitBeingCreated(bool amendPreviousCommit)
