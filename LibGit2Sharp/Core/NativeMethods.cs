@@ -1130,6 +1130,16 @@ namespace LibGit2Sharp.Core
             bool update_gitlink);
 
         [DllImport(libgit2)]
+        internal static extern int git_repository_set_head_detached(
+            RepositorySafeHandle repo,
+            GitOid commitish);
+
+        [DllImport(libgit2)]
+        internal static extern int git_repository_set_head(
+            RepositorySafeHandle repo,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier, MarshalTypeRef = typeof (StrictUtf8Marshaler))] string refname);
+
+        [DllImport(libgit2)]
         internal static extern int git_repository_state(
             RepositorySafeHandle repository);
 

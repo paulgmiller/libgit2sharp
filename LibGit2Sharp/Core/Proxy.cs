@@ -2108,6 +2108,24 @@ namespace LibGit2Sharp.Core
             return NativeMethods.git_repository_workdir(repo);
         }
 
+        public static void git_repository_set_head_detached(RepositorySafeHandle repo, ObjectId commitish)
+        {
+            using (ThreadAffinity())
+            {
+                int res = NativeMethods.git_repository_set_head_detached(repo, commitish.Oid);
+                Ensure.ZeroResult(res);
+            }
+        }
+
+        public static void git_repository_set_head(RepositorySafeHandle repo, string refname)
+        {
+            using (ThreadAffinity())
+            {
+                int res = NativeMethods.git_repository_set_head(repo, refname);
+                Ensure.ZeroResult(res);
+            }
+        }
+
         #endregion
 
         #region git_reset_
