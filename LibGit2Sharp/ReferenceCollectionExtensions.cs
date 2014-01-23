@@ -75,6 +75,12 @@ namespace LibGit2Sharp
             return Add(refsColl, name, canonicalRefNameOrObjectish, null, null, allowOverwrite);
         }
 
+        [Obsolete("Prefer the overload that takes a signature and a message for the reflog.")]
+        public static Reference Add(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish, bool allowOverwrite, string logMessage)
+        {
+            return Add(refsColl, name, canonicalRefNameOrObjectish, null, logMessage, allowOverwrite);
+        }
+
         /// <summary>
         /// Updates the target of a direct reference.
         /// </summary>
@@ -99,6 +105,12 @@ namespace LibGit2Sharp
         public static Reference UpdateTarget(this ReferenceCollection refsColl, Reference directRef, string objectish)
         {
             return UpdateTarget(refsColl, directRef, objectish, null, null);
+        }
+
+        [Obsolete("Prefer the overload that takes a signature and a message for the reflog.")]
+        public static Reference UpdateTarget(this ReferenceCollection refsColl, Reference directRef, string objectish, string logMessage)
+        {
+            return UpdateTarget(refsColl, directRef, objectish, null, logMessage);
         }
 
         /// <summary>
@@ -173,6 +185,12 @@ namespace LibGit2Sharp
         public static Reference UpdateTarget(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish)
         {
             return UpdateTarget(refsColl, name, canonicalRefNameOrObjectish, null, null);
+        }
+
+        [Obsolete("Prefer the overload that takes a signature and a message for the reflog.")]
+        public static Reference UpdateTarget(this ReferenceCollection refsColl, string name, string canonicalRefNameOrObjectish, string logMessage)
+        {
+            return UpdateTarget(refsColl, name, canonicalRefNameOrObjectish, null, logMessage);
         }
 
 

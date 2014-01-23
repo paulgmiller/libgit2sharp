@@ -95,6 +95,12 @@ namespace LibGit2Sharp
             return Add(name, targetId, null, null, allowOverwrite);
         }
 
+        [Obsolete("Prefer the overload that takes a signature and a message for the reflog.")]
+        public virtual DirectReference Add(string name, ObjectId targetId, bool allowOverwrite, string logMessage)
+        {
+            return Add(name, targetId, null, logMessage, allowOverwrite);
+        }
+
         /// <summary>
         /// Creates a symbolic reference  with the specified name and target
         /// </summary>
@@ -122,6 +128,12 @@ namespace LibGit2Sharp
         public virtual SymbolicReference Add(string name, Reference targetRef, bool allowOverwrite = false)
         {
             return Add(name, targetRef, null, null, allowOverwrite);
+        }
+
+        [Obsolete("Prefer the overload that takes a signature and a message for the reflog.")]
+        public virtual SymbolicReference Add(string name, Reference targetRef, bool allowOverwrite, string logMessage)
+        {
+            return Add(name, targetRef, null, logMessage, allowOverwrite);
         }
 
         /// <summary>
@@ -195,6 +207,12 @@ namespace LibGit2Sharp
             return UpdateTarget(directRef, targetId, null, null);
         }
 
+        [Obsolete("Prefer the overload that takes a signature and a message for the reflog.")]
+        public virtual Reference UpdateTarget(Reference directRef, ObjectId targetId, string logMessage)
+        {
+            return UpdateTarget(directRef, targetId, null, logMessage);
+        }
+
         /// <summary>
         /// Updates the target of a symbolic reference.
         /// </summary>
@@ -219,6 +237,12 @@ namespace LibGit2Sharp
         public virtual Reference UpdateTarget(Reference symbolicRef, Reference targetRef)
         {
             return UpdateTarget(symbolicRef, targetRef, null, null);
+        }
+
+        [Obsolete("Prefer the overload that takes a signature and a message for the reflog.")]
+        public virtual Reference UpdateTarget(Reference symbolicRef, Reference targetRef, string logMessage)
+        {
+            return UpdateTarget(symbolicRef, targetRef, null, logMessage);
         }
 
         private Reference UpdateTarget<T>(Reference reference, T target, Func<ReferenceSafeHandle, T, ReferenceSafeHandle> setter)
