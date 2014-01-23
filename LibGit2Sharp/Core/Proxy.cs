@@ -1509,27 +1509,29 @@ namespace LibGit2Sharp.Core
             }
         }
 
-        public static ReferenceSafeHandle git_reference_set_target(ReferenceSafeHandle reference, ObjectId id)
+        public static ReferenceSafeHandle git_reference_set_target(ReferenceSafeHandle reference, ObjectId id, Signature signature, string logMessage)
         {
             using (ThreadAffinity())
+            using (SignatureSafeHandle sigHandle = signature.BuildHandle())
             {
                 GitOid oid = id.Oid;
                 ReferenceSafeHandle ref_out;
 
-                int res = NativeMethods.git_reference_set_target(out ref_out, reference, ref oid);
+                int res = NativeMethods.git_reference_set_target(out ref_out, reference, ref oid, sigHandle, logMessage);
                 Ensure.ZeroResult(res);
 
                 return ref_out;
             }
         }
 
-        public static ReferenceSafeHandle git_reference_symbolic_set_target(ReferenceSafeHandle reference, string target)
+        public static ReferenceSafeHandle git_reference_symbolic_set_target(ReferenceSafeHandle reference, string target, Signature signature, string logMessage)
         {
             using (ThreadAffinity())
+            using (SignatureSafeHandle sigHandle = signature.BuildHandle())
             {
                 ReferenceSafeHandle ref_out;
 
-                int res = NativeMethods.git_reference_symbolic_set_target(out ref_out, reference, target);
+                int res = NativeMethods.git_reference_symbolic_set_target(out ref_out, reference, target, sigHandle, logMessage);
                 Ensure.ZeroResult(res);
 
                 return ref_out;
@@ -2278,6 +2280,17 @@ namespace LibGit2Sharp.Core
                                                           (int)when.Offset.TotalMinutes);
                 Ensure.ZeroResult(res);
 
+                return handle;
+            }
+        }
+
+        public static IntPtr git_signature_dup(IntPtr sig)
+        {
+            using (ThreadAffinity())
+            {
+                IntPtr handle;
+                int res = NativeMethods.git_signature_dup(out handle, sig);
+                Ensure.ZeroResult(res);
                 return handle;
             }
         }

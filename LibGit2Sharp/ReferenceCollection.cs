@@ -194,10 +194,13 @@ namespace LibGit2Sharp
             Ensure.ArgumentNotNull(directRef, "directRef");
             Ensure.ArgumentNotNull(targetId, "targetId");
 
-            Reference newTarget = UpdateTarget(directRef, targetId,
-                Proxy.git_reference_set_target);
+            if (signature == null)
+            {
+                signature = repo.Config.BuildSignature(DateTimeOffset.Now);
+            }
 
-            LogReference(directRef, targetId, signature, logMessage);
+            Reference newTarget = UpdateTarget(directRef, targetId,
+                (rf, tgt) => Proxy.git_reference_set_target(rf, tgt, signature, logMessage));
 
             return newTarget;
         }
@@ -226,10 +229,13 @@ namespace LibGit2Sharp
             Ensure.ArgumentNotNull(symbolicRef, "symbolicRef");
             Ensure.ArgumentNotNull(targetRef, "targetRef");
 
-            Reference newTarget = UpdateTarget(symbolicRef, targetRef,
-                (h, r) => Proxy.git_reference_symbolic_set_target(h, r.CanonicalName));
+            if (signature == null)
+            {
+                signature = repo.Config.BuildSignature(DateTimeOffset.Now);
+            }
 
-            LogReference(symbolicRef, targetRef, signature, logMessage);
+            Reference newTarget = UpdateTarget(symbolicRef, targetRef,
+                (h, r) => Proxy.git_reference_symbolic_set_target(h, r.CanonicalName, signature, logMessage));
 
             return newTarget;
         }
