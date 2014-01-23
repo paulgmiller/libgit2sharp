@@ -82,11 +82,7 @@ namespace LibGit2Sharp
 
             using (ReferenceSafeHandle handle = Proxy.git_reference_create(repo.Handle, name, targetId, allowOverwrite))
             {
-                var newTarget = (DirectReference)Reference.BuildFromPtr<Reference>(handle, repo);
-
-                LogReference(newTarget, targetId, signature, logMessage);
-
-                return newTarget;
+                return (DirectReference)Reference.BuildFromPtr<Reference>(handle, repo);
             }
         }
 
@@ -117,11 +113,7 @@ namespace LibGit2Sharp
 
             using (ReferenceSafeHandle handle = Proxy.git_reference_symbolic_create(repo.Handle, name, targetRef.CanonicalName, allowOverwrite))
             {
-                var newTarget = (SymbolicReference)Reference.BuildFromPtr<Reference>(handle, repo);
-
-                LogReference(newTarget, targetRef, signature, logMessage);
-
-                return newTarget;
+                return (SymbolicReference)Reference.BuildFromPtr<Reference>(handle, repo);
             }
         }
 
@@ -265,6 +257,8 @@ namespace LibGit2Sharp
                 }
                 else throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "'{0}' is not a valid target type.", typeof(T)));
+
+                return repo.Refs.Head;
             }
 
             using (ReferenceSafeHandle referencePtr = RetrieveReferencePtr(reference.CanonicalName))
@@ -274,23 +268,6 @@ namespace LibGit2Sharp
                     return Reference.BuildFromPtr<Reference>(ref_out, repo);
                 }
             }
-        }
-
-        private void LogReference(Reference reference, Reference target, Signature signature, string logMessage)
-        {
-            var directReference = target.ResolveToDirectReference();
-
-            if (directReference == null)
-            {
-                return;
-            }
-
-            LogReference(reference, directReference.Target.Id, signature, logMessage);
-        }
-
-        private void LogReference(Reference reference, ObjectId target, Signature signature, string logMessage)
-        {
-            repo.Refs.Log(reference).Append(target, signature, logMessage);
         }
 
         internal ReferenceSafeHandle RetrieveReferencePtr(string referenceName, bool shouldThrowIfNotFound = true)

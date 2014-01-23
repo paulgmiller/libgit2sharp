@@ -521,6 +521,7 @@ namespace LibGit2Sharp.Tests
                 const string name = "refs/heads/master";
 
                 var master = (DirectReference) repo.Refs[name];
+                var @from = master.Target.Id;
 
                 const string logMessage = "update target message";
                 var newRef = (DirectReference)repo.Refs.UpdateTarget(master, "master^1^2", Constants.Signature, logMessage);
@@ -533,7 +534,8 @@ namespace LibGit2Sharp.Tests
 
                 AssertRefLogEntry(repo, name,
                                   newRef.Target.Id,
-                                  logMessage);
+                                  logMessage,
+                                  @from);
             }
         }
 

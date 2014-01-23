@@ -128,7 +128,6 @@ namespace LibGit2Sharp
             using (Proxy.git_branch_create(repo.Handle, name, commit.Id, allowOverwrite)) {}
 
             var branch = this[ShortToLocalName(name)];
-            LogBranch(branch, logMessage);
             return branch;
         }
 
@@ -173,7 +172,6 @@ namespace LibGit2Sharp
             }
 
             var newBranch = this[newName];
-            LogBranch(newBranch, "Branch: renamed " + branch.CanonicalName + " to " + newBranch.CanonicalName);
             return newBranch;
         }
 
