@@ -158,5 +158,30 @@ namespace LibGit2Sharp.Tests
                 Assert.Equal(expectAppend ? 1 : 0, log.Count());
             }
         }
+
+        [Fact]
+        public void UnsignedMethodsWriteCorrectlyToTheReflog()
+        {
+            var repoPath = InitNewRepository(true);
+            using (var repo = new Repository(repoPath))
+            {
+                EnableRefLog(repo);
+
+                var blob = repo.ObjectDatabase.CreateBlob(Stream.Null);
+                var tree = repo.ObjectDatabase.CreateTree(new TreeDefinition().Add("yoink", blob, Mode.NonExecutableFile));
+                var commit = repo.ObjectDatabase.CreateCommit("yoink", Constants.Signature, Constants.Signature,
+                                                 tree, Enumerable.Empty<Commit>());
+
+                var direct = repo.Refs.Add("refs/heads/direct", commit.Id);
+                var directLogEntry = repo.Refs.Log(direct).First();
+                Assert.Equal(directLogEntry.Commiter, repo.Config.BuildSignature(directLogEntry.Commiter.When));
+                Assert.True(string.IsNullOrEmpty(directLogEntry.Message));
+
+                var symbolic = repo.Refs.Add("refs/heads/symbolic", direct);
+                var symbolicLogEntry = repo.Refs.Log(symbolic).First();
+                Assert.Equal(symbolicLogEntry.Commiter, repo.Config.BuildSignature(symbolicLogEntry.Commiter.When));
+                Assert.True(string.IsNullOrEmpty(symbolicLogEntry.Message));
+            }
+        }
     }
 }
