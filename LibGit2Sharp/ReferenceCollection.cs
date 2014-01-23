@@ -251,20 +251,13 @@ namespace LibGit2Sharp
             {
                 if (target is ObjectId)
                 {
-                    return Add("HEAD", target as ObjectId, true);
+                    Proxy.git_repository_set_head_detached(repo.Handle, target as ObjectId);
                 }
-
-                if (target is DirectReference)
+                else if (target is DirectReference || target is SymbolicReference)
                 {
-                    return Add("HEAD", target as DirectReference, true);
+                    Proxy.git_repository_set_head(repo.Handle, (target as Reference).CanonicalName);
                 }
-
-                if (target is SymbolicReference)
-                {
-                    return Add("HEAD", target as SymbolicReference, true);
-                }
-
-                throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
+                else throw new ArgumentException(string.Format(CultureInfo.InvariantCulture,
                     "'{0}' is not a valid target type.", typeof(T)));
             }
 
@@ -291,11 +284,6 @@ namespace LibGit2Sharp
 
         private void LogReference(Reference reference, ObjectId target, Signature signature, string logMessage)
         {
-            if (string.IsNullOrEmpty(logMessage) || signature == null)
-            {
-                return;
-            }
-
             repo.Refs.Log(reference).Append(target, signature, logMessage);
         }
 

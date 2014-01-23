@@ -110,8 +110,12 @@ namespace LibGit2Sharp
 
             using (ReflogSafeHandle reflog = Proxy.git_reflog_read(repo.Handle, canonicalName))
             {
-                string prettifiedMessage = Proxy.git_message_prettify(reflogMessage);
-                Proxy.git_reflog_append(reflog, target, committer, prettifiedMessage);
+                string prettifiedMessage = reflogMessage == null
+                    ? ""
+                    : Proxy.git_message_prettify(reflogMessage);
+                Proxy.git_reflog_append(reflog, target, 
+                    committer ?? repo.Config.BuildSignature(DateTimeOffset.Now),
+                    prettifiedMessage);
             }
         }
 
