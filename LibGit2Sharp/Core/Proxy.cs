@@ -1400,26 +1400,30 @@ namespace LibGit2Sharp.Core
 
         #region git_reference_
 
-        public static ReferenceSafeHandle git_reference_create(RepositorySafeHandle repo, string name, ObjectId targetId, bool allowOverwrite)
+        public static ReferenceSafeHandle git_reference_create(RepositorySafeHandle repo, string name, ObjectId targetId, bool allowOverwrite,
+            Signature signature, string logMessage)
         {
             using (ThreadAffinity())
+            using (var sigHandle = signature.BuildHandle())
             {
                 GitOid oid = targetId.Oid;
                 ReferenceSafeHandle handle;
 
-                int res = NativeMethods.git_reference_create(out handle, repo, name, ref oid, allowOverwrite);
+                int res = NativeMethods.git_reference_create(out handle, repo, name, ref oid, allowOverwrite, sigHandle, logMessage);
                 Ensure.ZeroResult(res);
 
                 return handle;
             }
         }
 
-        public static ReferenceSafeHandle git_reference_symbolic_create(RepositorySafeHandle repo, string name, string target, bool allowOverwrite)
+        public static ReferenceSafeHandle git_reference_symbolic_create(RepositorySafeHandle repo, string name, string target, bool allowOverwrite,
+            Signature signature, string logMessage)
         {
             using (ThreadAffinity())
+            using (var sigHandle = signature.BuildHandle())
             {
                 ReferenceSafeHandle handle;
-                int res = NativeMethods.git_reference_symbolic_create(out handle, repo, name, target, allowOverwrite);
+                int res = NativeMethods.git_reference_symbolic_create(out handle, repo, name, target, allowOverwrite, sigHandle, logMessage);
                 Ensure.ZeroResult(res);
 
                 return handle;
