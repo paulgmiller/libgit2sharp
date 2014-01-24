@@ -872,6 +872,11 @@ namespace LibGit2Sharp.Core
         internal static extern GitReferenceType git_reference_type(ReferenceSafeHandle reference);
 
         [DllImport(libgit2)]
+        internal static extern int git_reference_ensure_log(
+            RepositorySafeHandle repo,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier, MarshalTypeRef = typeof (StrictUtf8Marshaler))] string refname);
+
+        [DllImport(libgit2)]
         internal static extern void git_reflog_free(
             IntPtr reflog);
 

@@ -73,6 +73,7 @@ namespace LibGit2Sharp
 
             Ensure.GitObjectIsNotNull(gitObject, canonicalRefNameOrObjectish);
 
+            refsColl.EnsureHasLog(name);
             return refsColl.Add(name, gitObject.Id, signature, logMessage, allowOverwrite);
         }
 

@@ -1552,6 +1552,15 @@ namespace LibGit2Sharp.Core
             return NativeMethods.git_reference_type(reference);
         }
 
+        public static void git_reference_ensure_log(RepositorySafeHandle repo, string refname)
+        {
+            using (ThreadAffinity())
+            {
+                int res = NativeMethods.git_reference_ensure_log(repo, refname);
+                Ensure.ZeroResult(res);
+            }
+        }
+
         #endregion
 
         #region git_reflog_
