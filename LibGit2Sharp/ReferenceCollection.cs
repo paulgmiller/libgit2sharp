@@ -80,6 +80,11 @@ namespace LibGit2Sharp
             Ensure.ArgumentNotNullOrEmptyString(name, "name");
             Ensure.ArgumentNotNull(targetId, "targetId");
 
+            if (signature == null)
+            {
+                signature = repo.Config.BuildSignature(DateTimeOffset.Now);
+            }
+
             using (ReferenceSafeHandle handle = Proxy.git_reference_create(repo.Handle, name, targetId, allowOverwrite, signature, logMessage))
             {
                 return (DirectReference)Reference.BuildFromPtr<Reference>(handle, repo);
@@ -110,6 +115,11 @@ namespace LibGit2Sharp
         {
             Ensure.ArgumentNotNullOrEmptyString(name, "name");
             Ensure.ArgumentNotNull(targetRef, "targetRef");
+
+            if (signature == null)
+            {
+                signature = repo.Config.BuildSignature(DateTimeOffset.Now);
+            }
 
             using (ReferenceSafeHandle handle = Proxy.git_reference_symbolic_create(repo.Handle, name, targetRef.CanonicalName, allowOverwrite, signature, logMessage))
             {
